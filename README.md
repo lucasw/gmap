@@ -16,3 +16,15 @@ Make a geojson from python
 ==========================
 
 http://gis.stackexchange.com/a/41658
+
+
+gh-pages
+========
+
+http://ryanfitzer.org/2011/11/easy-syncing-of-github-pages/
+
+mirroring::
+  git checkout gh-pages
+  git merge master
+  git push origin gh-pages
+  git checkout master
