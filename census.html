@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 100% }
+     .labels {
+       color: black;
+       background-color: transparent;
+       font-family: "Lucida Grande", "Arial", sans-serif;
+       font-size: 20px;
+       font-weight: bold;
+       text-align: center;
+       width: 300px;
+       border: 0px solid black;
+       white-space: nowrap;
+     }
+     .dist_labels {
+       color: black;
+       background-color: transparent;
+       font-family: "Lucida Grande", "Arial", sans-serif;
+       font-size: 40px;
+       font-weight: bold;
+       text-align: center;
+       width: 40px;
+       border: 0px solid black;
+       white-space: nowrap;
+     }
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3AJRP_F-Bh6weENamgK-3m4yuJgh4KNk">
+    </script>
+    <script type="text/javascript" src="lib/markerwithlabel.js"></script>
+    <script type="text/javascript" src='census.js'>>
+    </script>
+  </head>
+  <body>
+    <div id="map-canvas"/>
+  </body>
+</html>
