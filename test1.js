@@ -9,6 +9,8 @@ function initialize() {
       mapOptions);
 
   map.data.loadGeoJson("data/seattle_city_council_districts.json");
+  
+  var infowindow = new google.maps.InfoWindow({});
 
   // Color Capital letters blue, and lower case letters red.
   // Capital letters are represented in ascii by values less than 91
@@ -20,7 +22,17 @@ function initialize() {
       var l = "60%";
       var color = "hsl(" + h + "," + s + "," + l +")";
       var stroke_color = "hsl(" + h + ", 90%, 30%)";
-      console.log(id + " " + color);
+     
+      // is this the right place to define this?
+      feature.content = '<div id="content">' +
+        '<p>feature' +
+        '<p>' + feature.getProperty('id') +
+        '</div>'; //h + " " + id;
+      // TBD
+      //http://stackoverflow.com/questions/24144782/example-of-using-feature-foreachproperty-in-google-maps-javascript-v3
+      //feature.forEachPropert(
+      console.log(feature.content);
+
       return {
         fillColor: color,
         fillOpacity: 0.0,
@@ -28,12 +40,31 @@ function initialize() {
         strokeWeight: 5
       };
 
-      // how to put a label at the center of the feature?
-      // Probably ought to save the centroid into the json properties?
-      // Better tools in python than javascript
   });
 
   var homeLatLng = new google.maps.LatLng(47.6043, -122.342);
+  var marker_tract = new MarkerWithLabel({
+    position: homeLatLng,
+    draggable: true,
+    raiseOnDrag: false,
+    map: map,
+    labelContent: "Seattle Council Districts",
+    labelAnchor: new google.maps.Point(100, 0),
+    labelClass: "labels", // the CSS class for the label
+    labelStyle: {opacity: 0.75},
+    icon: {}
+
+  });
+
+  //google.maps.event
+  map.data.addListener('click', function(event) {
+      console.log(event.feature.content);
+      infowindow.setContent(event.feature.content);
+      //infowindow.open(this.getMap(), this);
+      marker_tract.position = event.latLng;  // anything like feature.getPosition(); //TBD
+      infowindow.open(map, marker_tract); 
+  });
+
   var latLng0 = new google.maps.LatLng(47.609635,-122.456019);
   var marker0 = new MarkerWithLabel({
     position: latLng0,
@@ -48,7 +79,6 @@ function initialize() {
 
   });
 
-  var infowindow = new google.maps.InfoWindow({});
 
   // TBD replace these with locations that are population 
   // centroids, compute them in python 
@@ -79,10 +109,6 @@ function initialize() {
     });
     marker.content = "District " + (i+1)
 
-    google.maps.event.addListener(marker, 'click', function() {
-      infowindow.setContent(this.content);
-      infowindow.open(this.getMap(), this); 
-    });
   }
 
 
