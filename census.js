@@ -14,15 +14,20 @@ function initialize() {
   map.data.setStyle(function(feature) {
       var id = feature.getProperty('density');
 
-      var h = Math.round( 360 * id/200.0 );
+      var h = Math.round( 360 * id/100.0);
       var s = "90%";
       var l = "60%";
+      fill_opacity = 0.2;
+      if (id == 0) {
+        fill_opacity = 0.01;
+        l = "100%";
+      }
       var color = "hsl(" + h + "," + s + "," + l +")";
       var stroke_color = "hsl(" + h + ", 90%, 30%)";
       console.log(id + " " + color);
       return {
         fillColor: color,
-        fillOpacity: 0.2,
+        fillOpacity: fill_opacity,
         strokeColor: stroke_color, 
         strokeWeight: 1,
         strokeOpacity: 0.25
