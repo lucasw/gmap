@@ -1,4 +1,5 @@
 var map;
+var infos = {};
 function initialize() {
   var mapOptions = {
     center: new google.maps.LatLng(47.6043, -122.342),
@@ -47,6 +48,8 @@ function initialize() {
 
   });
 
+  var infowindow = new google.maps.InfoWindow({});
+
   // TBD replace these with locations that are population 
   // centroids, compute them in python 
   var distLatLngs = [
@@ -58,7 +61,10 @@ function initialize() {
       new google.maps.LatLng(47.668624,-122.374992),
       new google.maps.LatLng(47.627917,-122.357826),
       ];
-  
+  // java scoping problem is only ever keeping the last 
+  // infowindow around
+  //  http://stackoverflow.com/questions/3576488/google-maps-infowindow-only-loading-last-record-on-markers
+  //var markers = {};
   for (var i = 0; i < distLatLngs.length; i++) {
     var marker = new MarkerWithLabel({
       position: distLatLngs[i],
@@ -71,8 +77,16 @@ function initialize() {
       labelStyle: {opacity: 0.75},
       icon: {}
     });
+    marker.content = "District " + (i+1)
+
+    google.maps.event.addListener(marker, 'click', function() {
+      infowindow.setContent(this.content);
+      infowindow.open(this.getMap(), this); 
+    });
   }
-}
+
+
+} // initialize
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
