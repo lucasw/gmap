@@ -74,18 +74,21 @@ function initialize() {
     var density = event.feature.getProperty('density');
     var area = event.feature.getProperty('area');
     
-    var content = '<div id="content">' +
-        '<p>feature' +
-        '<p>' + density.toFixed(2) + ' people per acre' +
-        '<p>' + area.toFixed(2) + ' acres' +
-        '</div>'; 
+    var content = '<div id="content">'; // +
+        //'<br>Census Tract'; // +
+        //'<br>' + density.toFixed(2) + ' people per acre' +
+        //'<br>' + area.toFixed(2) + ' acres' +
 
+    event.feature.forEachProperty(function(value, property) {
+          content +=  '<br>' + property + ' : ' + value;
+          });
 
-      console.log(content);
-      infowindow.setContent(content);
-      //infowindow.open(this.getMap(), this);
-      marker_tract.position = event.latLng;  // anything like feature.getPosition(); //TBD
-      infowindow.open(map, marker_tract);
+    content += '</div>'; 
+    //console.log(content);
+    infowindow.setContent(content);
+    //infowindow.open(this.getMap(), this);
+    marker_tract.position = event.latLng;  // anything like feature.getPosition(); //TBD
+    infowindow.open(map, marker_tract);
   });
  
 }
