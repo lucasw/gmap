@@ -24,6 +24,7 @@ function initialize() {
       var stroke_color = "hsl(" + h + ", 90%, 30%)";
      
       // is this the right place to define this?
+      // no, put it in a forEach function
       feature.content = '<div id="content">' +
         '<p>feature' +
         '<p>' + feature.getProperty('id') +

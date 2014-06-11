@@ -1,4 +1,5 @@
 var map;
+
 function initialize() {
   var mapOptions = {
     center: new google.maps.LatLng(47.6043, -122.342),
@@ -10,8 +11,22 @@ function initialize() {
   map.data.loadGeoJson("data/seattle_census_tracts.json");
   
   var infowindow = new google.maps.InfoWindow({
-    content: str(density)
   });
+
+  /*
+  map.data.forEach(function(feature) {
+    var density = feature.getProperty('density');
+    var area = feature.getProperty('area');
+    
+    feature.content = '<div id="content">' +
+        '<p>feature' +
+        '<p>' + density + ' people per acre' +
+        '<p>' + area + ' acres' +
+        '</div>'; 
+
+    console.log(density);
+  });
+*/
 
   map.data.setStyle(function(feature) {
       var density = feature.getProperty('density');
@@ -26,7 +41,12 @@ function initialize() {
       }
       var color = "hsl(" + h + "," + s + "," + l +")";
       var stroke_color = "hsl(" + h + ", 90%, 30%)";
-      console.log(density + " " + color);
+      //console.log(density + " " + color);
+      // this is probably the wrong time to do this?
+
+      // how to put a label at the center of the feature?
+      // Probably ought to save the centroid into the json properties?
+      // Better tools in python than javascript
       return {
         fillColor: color,
         fillOpacity: fill_opacity,
@@ -35,15 +55,39 @@ function initialize() {
         strokeOpacity: 0.25
       };
 
-      // this is probably the wrong time to do this?
-      google.maps.event.addListener(feature, 'click', function() {
-        infowindow.open(map, feature); 
-      });
-
-      // how to put a label at the center of the feature?
-      // Probably ought to save the centroid into the json properties?
-      // Better tools in python than javascript
   });
+
+  var homeLatLng = new google.maps.LatLng(47.6043, -122.342);
+  var marker_tract = new MarkerWithLabel({
+    position: homeLatLng,
+    draggable: false,
+    raiseOnDrag: false,
+    map: map,
+    labelContent: "",
+    labelAnchor: new google.maps.Point(0, 0),
+    labelClass: "labels", // the CSS class for the label
+    labelStyle: {opacity: 0.75},
+    icon: {}
+  });
+
+  map.data.addListener('click', function(event) {
+    var density = event.feature.getProperty('density');
+    var area = event.feature.getProperty('area');
+    
+    var content = '<div id="content">' +
+        '<p>feature' +
+        '<p>' + density.toFixed(2) + ' people per acre' +
+        '<p>' + area.toFixed(2) + ' acres' +
+        '</div>'; 
+
+
+      console.log(content);
+      infowindow.setContent(content);
+      //infowindow.open(this.getMap(), this);
+      marker_tract.position = event.latLng;  // anything like feature.getPosition(); //TBD
+      infowindow.open(map, marker_tract);
+  });
+ 
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
