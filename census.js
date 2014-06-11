@@ -52,12 +52,14 @@ function initialize() {
         fillOpacity: fill_opacity,
         strokeColor: stroke_color, 
         strokeWeight: 1,
-        strokeOpacity: 0.25
+        strokeOpacity: 0.4
       };
 
   });
 
-  var homeLatLng = new google.maps.LatLng(47.6043, -122.342);
+  // this marker will flash on screen at this location when a new
+  // feature is clicked
+  var homeLatLng = new google.maps.LatLng(47.0043, -122.342);
   var marker_tract = new MarkerWithLabel({
     position: homeLatLng,
     draggable: false,
@@ -80,8 +82,10 @@ function initialize() {
         //'<br>' + area.toFixed(2) + ' acres' +
 
     event.feature.forEachProperty(function(value, property) {
-          content +=  '<br>' + property + ' : ' + value;
-          });
+        if (property == 'density') value = value.toFixed(2) + ' persons/acre';
+        if (property == 'area') value = value.toFixed(2) + ' acres';
+        content +=  property + ' : ' + value + '<br>';
+        });
 
     content += '</div>'; 
     //console.log(content);
@@ -89,6 +93,10 @@ function initialize() {
     //infowindow.open(this.getMap(), this);
     marker_tract.position = event.latLng;  // anything like feature.getPosition(); //TBD
     infowindow.open(map, marker_tract);
+
+    map.data.revertStyle();
+    map.data.overrideStyle(event.feature, 
+      {strokeOpacity: 0.9, strokeWeight: 3, strokeColor: 'black'} );
   });
  
 }
