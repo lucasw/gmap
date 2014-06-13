@@ -1,14 +1,16 @@
 var map;
+var selected_tractce = -1;
 
 function initialize() {
   var mapOptions = {
     center: new google.maps.LatLng(47.6043, -122.342),
-        zoom: 12
+        zoom: 14 // 12 covers most of Seattle
   };
   map = new google.maps.Map(document.getElementById("map-canvas"),
       mapOptions);
 
-  map.data.loadGeoJson("data/seattle_census_tracts.json");
+  //map.data.loadGeoJson("data/seattle_census_tracts.json");
+  map.data.loadGeoJson("data/seattle_census_tracts_district_7.json"); 
   
   var infowindow = new google.maps.InfoWindow({
   });
@@ -30,7 +32,7 @@ function initialize() {
 
   map.data.setStyle(function(feature) {
       var density = feature.getProperty('density');
-
+      
       var h = Math.round( 360 * density/100.0);
       var s = "90%";
       var l = "60%";
@@ -41,6 +43,11 @@ function initialize() {
       }
       var color = "hsl(" + h + "," + s + "," + l +")";
       var stroke_color = "hsl(" + h + ", 90%, 30%)";
+      var stroke_opacity = 0.4;
+
+      //console.log(tractce + " " + selected_tractce);
+      
+
       //console.log(density + " " + color);
       // this is probably the wrong time to do this?
 
@@ -52,7 +59,7 @@ function initialize() {
         fillOpacity: fill_opacity,
         strokeColor: stroke_color, 
         strokeWeight: 1,
-        strokeOpacity: 0.4
+        strokeOpacity: stroke_opacity
       };
 
   });
@@ -82,11 +89,26 @@ function initialize() {
         //'<br>' + area.toFixed(2) + ' acres' +
 
     event.feature.forEachProperty(function(value, property) {
+        if (property == 'TRACTCE10') {
+          selected_tractce = value;
+          //console.log(selected_tractce);
+        }
         if (property == 'density') value = value.toFixed(2) + ' persons/acre';
         if (property == 'area') value = value.toFixed(2) + ' acres';
         content +=  property + ' : ' + value + '<br>';
         });
 
+    console.log("cur tract " + selected_tractce);
+    map.data.forEach(function(feature) {
+      var tractce = feature.getProperty('TRACTCE10');
+      if (tractce == selected_tractce) {
+        var blockce = feature.getProperty('BLOCKCE');
+        console.log("cur block " + blockce);
+        map.data.overrideStyle(feature, 
+        {strokeOpacity: 0.9, strokeWeight: 2, strokeColor: 'blue'} );
+      }
+    });
+    
     content += '</div>'; 
     //console.log(content);
     infowindow.setContent(content);
