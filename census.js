@@ -57,6 +57,7 @@ function initialize() {
       return {
         fillColor: color,
         fillOpacity: fill_opacity,
+        zIndex: 5,
         strokeColor: stroke_color, 
         strokeWeight: 1,
         strokeOpacity: stroke_opacity
@@ -80,6 +81,7 @@ function initialize() {
   });
 
   map.data.addListener('click', function(event) {
+    map.data.revertStyle();
     var density = event.feature.getProperty('density');
     var area = event.feature.getProperty('area');
     
@@ -103,9 +105,14 @@ function initialize() {
       var tractce = feature.getProperty('TRACTCE10');
       if (tractce == selected_tractce) {
         var blockce = feature.getProperty('BLOCKCE');
-        console.log("cur block " + blockce);
+        console.log("cur block " + blockce + "," + feature);
         map.data.overrideStyle(feature, 
-        {strokeOpacity: 0.9, strokeWeight: 2, strokeColor: 'blue'} );
+        {
+          zIndex: 6,
+          strokeOpacity: 0.7, 
+          strokeWeight: 2, 
+          strokeColor: 'red'
+          } );
       }
     });
     
@@ -116,9 +123,10 @@ function initialize() {
     marker_tract.position = event.latLng;  // anything like feature.getPosition(); //TBD
     infowindow.open(map, marker_tract);
 
-    map.data.revertStyle();
     map.data.overrideStyle(event.feature, 
-      {strokeOpacity: 0.9, strokeWeight: 3, strokeColor: 'black'} );
+      {
+        zIndex: 7,
+        strokeOpacity: 0.9, strokeWeight: 4, strokeColor: 'black'} );
   });
  
 }
