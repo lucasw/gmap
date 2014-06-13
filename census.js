@@ -1,10 +1,11 @@
 var map;
 var selected_tractce = -1;
+var zoom_level = 14;
 
 function initialize() {
   var mapOptions = {
     center: new google.maps.LatLng(47.6043, -122.342),
-        zoom: 14 // 12 covers most of Seattle
+        zoom: zoom_level // 12 covers most of Seattle
   };
   map = new google.maps.Map(document.getElementById("map-canvas"),
       mapOptions);
@@ -13,6 +14,12 @@ function initialize() {
   map.data.loadGeoJson("data/seattle_census_tracts_district_7.json"); 
   
   var infowindow = new google.maps.InfoWindow({
+  });
+
+  google.maps.event.addListener(map, 'zoom_changed', function() {
+      
+      zoom_level = map.getZoom();
+      console.log("zoom " + zoom_level);
   });
 
   /*
@@ -91,6 +98,9 @@ function initialize() {
         //'<br>' + area.toFixed(2) + ' acres' +
 
     event.feature.forEachProperty(function(value, property) {
+        if (property == 'BLOCKID10') {
+          return;
+        }
         if (property == 'TRACTCE10') {
           selected_tractce = value;
           //console.log(selected_tractce);
@@ -101,16 +111,18 @@ function initialize() {
         });
 
     console.log("cur tract " + selected_tractce);
+
+
     map.data.forEach(function(feature) {
       var tractce = feature.getProperty('TRACTCE10');
       if (tractce == selected_tractce) {
         var blockce = feature.getProperty('BLOCKCE');
-        console.log("cur block " + blockce + "," + feature);
+        //console.log("cur block " + blockce + "," + feature);
         map.data.overrideStyle(feature, 
         {
           zIndex: 6,
           strokeOpacity: 0.7, 
-          strokeWeight: 2, 
+          strokeWeight: zoom_level/7.0 + 1, 
           strokeColor: 'red'
           } );
       }
@@ -126,7 +138,10 @@ function initialize() {
     map.data.overrideStyle(event.feature, 
       {
         zIndex: 7,
-        strokeOpacity: 0.9, strokeWeight: 4, strokeColor: 'black'} );
+        strokeOpacity: 0.9, 
+        strokeWeight: 4, 
+        strokeColor: 'black'
+        } );
   });
  
 }
