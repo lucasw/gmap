@@ -40,7 +40,7 @@ function initialize() {
   map.data.setStyle(function(feature) {
       var density = feature.getProperty('Shape_area');
       
-      var h = Math.round( 360 * density/1e6);
+      var h = Math.round( 360 * density/35e6);
       var s = "90%";
       var l = "60%";
       fill_opacity = 0.2;
