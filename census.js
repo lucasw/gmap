@@ -1,4 +1,5 @@
 var map;
+var info;
 var selected_tractce = -1;
 var zoom_level = 14;
 
@@ -9,13 +10,13 @@ function initialize() {
   };
   map = new google.maps.Map(document.getElementById("map-canvas"),
       mapOptions);
+  
+  info = document.getElementById("info");
+  info.innerHTML = "Select a block to get information"; 
 
   //map.data.loadGeoJson("data/seattle_census_tracts.json");
   map.data.loadGeoJson("data/seattle_census_tracts_district_7.json"); 
   
-  var infowindow = new google.maps.InfoWindow({
-    disableAutoPan: true
-  });
 
   google.maps.event.addListener(map, 'zoom_changed', function() {
       
@@ -74,11 +75,11 @@ function initialize() {
     icon: {}
   });
 
-  // click for infowindow
+  // click to update info
   map.data.addListener('click', function(event) {
     map.data.revertStyle();
     
-    var content = '<div class="info" id="content">'; // +
+    var content = "";
 
     event.feature.forEachProperty(function(value, property) {
         if (property == 'BLOCKID10') {
@@ -111,31 +112,9 @@ function initialize() {
       }
     });
     
-    content += '<br><br><br></div>'; 
+    content += '<br><br><br>'; 
     //console.log(content);
-    infowindow.setContent(content);
-    //marker_tract.position = event.latLng;
-    bounds = map.getBounds();
-    center = bounds.getCenter();
-    latlng_sw = bounds.getSouthWest();
-    latlng_ne = bounds.getNorthEast();
-
-    function infoPos() {
-      lat_len = latlng_ne.lat() - latlng_sw.lat();
-
-      return new google.maps.LatLng(
-        //event.latLng.lat(), 
-        //(latlng_sw.lat() + latlng_ne.lat())/2.0,  
-        latlng_sw.lat() - lat_len/34.0,
-        (latlng_ne.lng() + center.lng())/2.0 
-        //event.latLng.lng() + 0.015
-        );
-    }
-
-    marker_tract.position = infoPos();
-    
-    infowindow.open(map, marker_tract);
-    //infowindow.setPosition(event.latLng);
+    info.innerHTML = content; 
 
     map.data.overrideStyle(event.feature, 
       {
@@ -144,14 +123,6 @@ function initialize() {
         strokeWeight: 4, 
         strokeColor: 'black'
         } );
-
-    google.maps.event.addListener(map, 'dragend', function(event) {
-      //updateMarkerPosition(marker.getPosition());
-      console.log(map.getBounds().getSouthWest().lat());
-      //marker_tract.position = infoPos();
-      infowindow.setPosition(infoPos());
-      //infowindow.open(map, marker_tract);
-    });
   }); // click for info window
  
 }
