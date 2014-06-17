@@ -87,15 +87,13 @@ function initialize() {
     icon: {}
   });
 
+  // click for infowindow
   map.data.addListener('click', function(event) {
     map.data.revertStyle();
     var density = event.feature.getProperty('density');
     var area = event.feature.getProperty('area');
     
-    var content = '<div id="content">'; // +
-        //'<br>Census Tract'; // +
-        //'<br>' + density.toFixed(2) + ' people per acre' +
-        //'<br>' + area.toFixed(2) + ' acres' +
+    var content = '<div class="info" id="content">'; // +
 
     event.feature.forEachProperty(function(value, property) {
         if (property == 'BLOCKID10') {
@@ -131,9 +129,10 @@ function initialize() {
     content += '</div>'; 
     //console.log(content);
     infowindow.setContent(content);
-    //infowindow.open(this.getMap(), this);
-    marker_tract.position = event.latLng;  // anything like feature.getPosition(); //TBD
+    //marker_tract.position = event.latLng; 
+    marker_tract.position =new google.maps.LatLng(event.latLng.lat(), event.latLng.lng() + 0.015); 
     infowindow.open(map, marker_tract);
+    //infowindow.setPosition(event.latLng);
 
     map.data.overrideStyle(event.feature, 
       {
@@ -142,7 +141,7 @@ function initialize() {
         strokeWeight: 4, 
         strokeColor: 'black'
         } );
-  });
+  }); // click for info window
  
 }
 
