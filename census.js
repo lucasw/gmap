@@ -14,6 +14,7 @@ function initialize() {
   map.data.loadGeoJson("data/seattle_census_tracts_district_7.json"); 
   
   var infowindow = new google.maps.InfoWindow({
+    disableAutoPan: true
   });
 
   google.maps.event.addListener(map, 'zoom_changed', function() {
@@ -22,20 +23,6 @@ function initialize() {
       console.log("zoom " + zoom_level);
   });
 
-  /*
-  map.data.forEach(function(feature) {
-    var density = feature.getProperty('density');
-    var area = feature.getProperty('area');
-    
-    feature.content = '<div id="content">' +
-        '<p>feature' +
-        '<p>' + density + ' people per acre' +
-        '<p>' + area + ' acres' +
-        '</div>'; 
-
-    console.log(density);
-  });
-*/
 
   map.data.setStyle(function(feature) {
       var density = feature.getProperty('density');
@@ -90,8 +77,6 @@ function initialize() {
   // click for infowindow
   map.data.addListener('click', function(event) {
     map.data.revertStyle();
-    var density = event.feature.getProperty('density');
-    var area = event.feature.getProperty('area');
     
     var content = '<div class="info" id="content">'; // +
 
@@ -126,11 +111,29 @@ function initialize() {
       }
     });
     
-    content += '</div>'; 
+    content += '<br><br><br></div>'; 
     //console.log(content);
     infowindow.setContent(content);
-    //marker_tract.position = event.latLng; 
-    marker_tract.position =new google.maps.LatLng(event.latLng.lat(), event.latLng.lng() + 0.015); 
+    //marker_tract.position = event.latLng;
+    bounds = map.getBounds();
+    center = bounds.getCenter();
+    latlng_sw = bounds.getSouthWest();
+    latlng_ne = bounds.getNorthEast();
+
+    function infoPos() {
+      lat_len = latlng_ne.lat() - latlng_sw.lat();
+
+      return new google.maps.LatLng(
+        //event.latLng.lat(), 
+        //(latlng_sw.lat() + latlng_ne.lat())/2.0,  
+        latlng_sw.lat() - lat_len/34.0,
+        (latlng_ne.lng() + center.lng())/2.0 
+        //event.latLng.lng() + 0.015
+        );
+    }
+
+    marker_tract.position = infoPos();
+    
     infowindow.open(map, marker_tract);
     //infowindow.setPosition(event.latLng);
 
@@ -141,6 +144,14 @@ function initialize() {
         strokeWeight: 4, 
         strokeColor: 'black'
         } );
+
+    google.maps.event.addListener(map, 'dragend', function(event) {
+      //updateMarkerPosition(marker.getPosition());
+      console.log(map.getBounds().getSouthWest().lat());
+      //marker_tract.position = infoPos();
+      infowindow.setPosition(infoPos());
+      //infowindow.open(map, marker_tract);
+    });
   }); // click for info window
  
 }
