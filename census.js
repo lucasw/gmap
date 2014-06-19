@@ -3,6 +3,33 @@ var info;
 var selected_tractce = -1;
 var zoom_level = 14;
 
+var multiple_selection = false;
+
+function addToSelection() {
+  multiple_selection = true; 
+  
+  makeButtons();
+}
+
+function startNewSelection() {
+  multiple_selection = false; 
+  
+  makeButtons();
+}
+
+function makeButtons() {
+  buttons = document.getElementById("buttons");
+  buttons.innerHTML = '<br>';
+  if (!multiple_selection) { 
+    //console.log("multiple selection");
+    buttons.innerHTML += '<button onclick="addToSelection()">Add to selection</button>';
+  } else {
+    //console.log("starting new selection");
+    buttons.innerHTML += '<button onclick="startNewSelection()">Start New Selection</button>';
+  }
+  buttons.innerHTML += '<br>';
+}
+
 function initialize() {
   var mapOptions = {
     center: new google.maps.LatLng(47.6043, -122.342),
@@ -14,9 +41,10 @@ function initialize() {
   info = document.getElementById("info");
   info.innerHTML = "Select a block to get information"; 
 
+  makeButtons();
+
   //map.data.loadGeoJson("data/seattle_census_tracts.json");
   map.data.loadGeoJson("data/seattle_census_tracts_district_7.json"); 
-  
 
   google.maps.event.addListener(map, 'zoom_changed', function() {
       
@@ -77,7 +105,7 @@ function initialize() {
 
   // click to update info
   map.data.addListener('click', function(event) {
-    map.data.revertStyle();
+  map.data.revertStyle();
     
     var content = "";
 

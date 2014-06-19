@@ -6,12 +6,20 @@
       html { height: 100% }
       body { height: 100%; margin: 0; padding: 0 }
       #map-canvas { height: 100% }
-      #info {
+      #ui {
         float:right;
         width:200px;
        border: 10px solid white;
       }
-     .labels {
+      #buttons {
+        float:top;
+        height:300px;
+      }
+      #info {
+        float:bottom;
+        height:50%;
+      }
+      .labels {
        color: black;
        background-color: transparent;
        font-family: "Lucida Grande", "Arial", sans-serif;
@@ -42,8 +50,13 @@
     </script>
   </head>
   <body>
+    <div id="ui">
+    <div id="buttons">
+      buttons
+    </div>
     <div id="info">
-      test
+      info
+    </div>
     </div>
     <div id="map-canvas"/>
   </body>
