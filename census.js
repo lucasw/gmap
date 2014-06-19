@@ -1,6 +1,7 @@
 var map;
 var info;
 var selected_tractce = [];
+var selected_blocks = [];
 var zoom_level = 14;
 
 var multiple_selection = false;
@@ -16,7 +17,7 @@ function switchToSingleSelection() {
 }
 
 function clearSelection() {
-  selected_tractce = []; 
+  selected_blocks = []; 
 }
 
 // TBD box selection
@@ -109,56 +110,78 @@ function initialize() {
 
   // click to update info
   map.data.addListener('click', function(event) {
-  map.data.revertStyle();
+    map.data.revertStyle();
     
     var content = "";
+
+    var tractce = event.feature.getProperty('TRACTCE10');
+    selected_tractce = [tractce];
+    var block = event.feature.getProperty('BLOCKCE');
+   
+    new_block = {
+        'tract':tractce,
+        'block':block
+    };
+                                    
+    if (multiple_selection) {
+      // only add if not in list already TBD indexOf like this doesn't work
+      if (selected_blocks.indexOf(new_block) < 0) {
+        selected_blocks[selected_blocks.length] = new_block;
+      }
+    } else {
+      selected_blocks = [new_block];
+    }
 
     event.feature.forEachProperty(function(value, property) {
         if (property == 'BLOCKID10') {
           return;
         }
-        if (property == 'TRACTCE10') {
-          if (multiple_selection) {
-            // only add if not
-            if (selected_tractce.indexOf(value) < 0) {
-              selected_tractce[selected_tractce.length] = value;
-            }
-          } else {
-            selected_tractce = [value];
-
-          }
-          //console.log(selected_tractce);
-        }
+          
         if (property == 'density') value = value.toFixed(2) + ' persons/acre';
         if (property == 'area') value = value.toFixed(2) + ' acres';
         content +=  property + ' : ' + value + '<br>';
-        });
+    });
 
-    console.log("cur tract " + selected_tractce);
+    console.log("cur tract " + selected_tractce[0]);
 
     
     total_population = 0;
     total_area = 0;
     map.data.forEach(function(feature) {
-      var tractce = feature.getProperty('TRACTCE10');
-      for (var i = 0; i < selected_tractce.length; i++) {
+      
+      // for each selected block highlight if in same tract as selected
+      if (false) { //for (var i = 0; i < selected_tractce.length; i++) {
         if (tractce == selected_tractce[i]) {
-          
-          total_area += feature.getProperty('area');
-          total_population += feature.getProperty('POP10');
-          
-          //var blockce = feature.getProperty('BLOCKCE');
-          //console.log("cur block " + blockce + "," + feature);
           map.data.overrideStyle(feature, 
           {
             zIndex: 6,
             strokeOpacity: 0.7, 
-            strokeWeight: zoom_level/7.0 + 1, 
+            strokeWeight: zoom_level/10.0 + 1, 
             strokeColor: 'red'
             } );
         }
-      } // for each selected
-    });
+      }  
+      
+      var cur_block = feature.getProperty('BLOCKCE');
+      var cur_tract = feature.getProperty('TRACTCE10');
+      // aggregate stats over whole selection of blocks
+      for (var i = 0; i < selected_blocks.length; i++) {
+        // TBD the block numbers aren't unique
+        if ((cur_block == selected_blocks[i].block) && 
+            (cur_tract == selected_blocks[i].tract)) {
+          console.log(selected_blocks[i]);
+          total_area += feature.getProperty('area');
+          total_population += feature.getProperty('POP10');
+          map.data.overrideStyle(feature, 
+            {
+              zIndex: 7,
+              strokeOpacity: 0.7, 
+              strokeWeight: 3, 
+              strokeColor: 'black'
+            } );
+        }
+      } // for each selected block highlight 
+    });  // for each feature
    
     content += '<br><br>';
     content += 'total population :' + total_population.toFixed(2) + '<br>';
