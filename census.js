@@ -125,7 +125,18 @@ function initialize() {
                                     
     if (multiple_selection) {
       // only add if not in list already TBD indexOf like this doesn't work
-      if (selected_blocks.indexOf(new_block) < 0) {
+      var not_a_dupe = true;
+
+      for (var i = 0; i < selected_blocks.length; i++) {
+        // TBD the block numbers aren't unique
+        if ((block == selected_blocks[i].block) && 
+            (tract == selected_blocks[i].tract)) {
+          not_a_dupe = false;
+          break;
+        }
+      }
+
+      if (not_a_dupe) {
         selected_blocks[selected_blocks.length] = new_block;
       }
     } else {
@@ -144,7 +155,6 @@ function initialize() {
 
     console.log("cur tract " + selected_tractce[0]);
 
-    
     total_population = 0;
     total_area = 0;
     map.data.forEach(function(feature) {
