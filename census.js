@@ -128,7 +128,8 @@ function initialize() {
       var not_a_dupe = true;
 
       for (var i = 0; i < selected_blocks.length; i++) {
-        // TBD the block numbers aren't unique
+        // the block numbers aren't unique
+        // TBD click to unselect?
         if ((block == selected_blocks[i].block) && 
             (tractce == selected_blocks[i].tract)) {
           not_a_dupe = false;
@@ -158,14 +159,15 @@ function initialize() {
     total_population = 0;
     total_area = 0;
     map.data.forEach(function(feature) {
-      
+     
+      var cur_tract = feature.getProperty('TRACTCE10');
       // for each selected block highlight if in same tract as selected
-      if (false) { //for (var i = 0; i < selected_tractce.length; i++) {
-        if (tractce == selected_tractce[i]) {
+      for (var i = 0; i < selected_tractce.length; i++) {
+        if (cur_tract == selected_tractce[i]) {
           map.data.overrideStyle(feature, 
           {
             zIndex: 6,
-            strokeOpacity: 0.7, 
+            strokeOpacity: 0.4, 
             strokeWeight: zoom_level/10.0 + 1, 
             strokeColor: 'red'
             } );
@@ -173,7 +175,6 @@ function initialize() {
       }  
       
       var cur_block = feature.getProperty('BLOCKCE');
-      var cur_tract = feature.getProperty('TRACTCE10');
       // aggregate stats over whole selection of blocks
       for (var i = 0; i < selected_blocks.length; i++) {
         // the block numbers aren't unique
