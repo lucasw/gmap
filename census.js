@@ -118,7 +118,7 @@ function initialize() {
     selected_tractce = [tractce];
     var block = event.feature.getProperty('BLOCKCE');
    
-    new_block = {
+    var new_block = {
         'tract':tractce,
         'block':block
     };
@@ -130,7 +130,7 @@ function initialize() {
       for (var i = 0; i < selected_blocks.length; i++) {
         // TBD the block numbers aren't unique
         if ((block == selected_blocks[i].block) && 
-            (tract == selected_blocks[i].tract)) {
+            (tractce == selected_blocks[i].tract)) {
           not_a_dupe = false;
           break;
         }
@@ -176,10 +176,10 @@ function initialize() {
       var cur_tract = feature.getProperty('TRACTCE10');
       // aggregate stats over whole selection of blocks
       for (var i = 0; i < selected_blocks.length; i++) {
-        // TBD the block numbers aren't unique
+        // the block numbers aren't unique
         if ((cur_block == selected_blocks[i].block) && 
             (cur_tract == selected_blocks[i].tract)) {
-          console.log(selected_blocks[i]);
+          //console.log(selected_blocks[i]);
           total_area += feature.getProperty('area');
           total_population += feature.getProperty('POP10');
           map.data.overrideStyle(feature, 
