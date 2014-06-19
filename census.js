@@ -15,7 +15,7 @@ function switchToSingleSelection() {
   makeButtons();
 }
 
-function startNewSelection() {
+function clearSelection() {
   selected_tractce = []; 
 }
 
@@ -29,7 +29,7 @@ function makeButtons() {
     buttons.innerHTML += '<button onclick="addToSelection()">Add to selection</button>';
   } else {
     //console.log("starting new selection");
-    buttons.innerHTML += '<button onclick="switchToSinglSelection()">Switch To Single Selection</button>';
+    buttons.innerHTML += '<button onclick="switchToSingleSelection()">Switch To Single Selection</button>';
   }
   buttons.innerHTML += '<button onclick="clearSelection()">Clear Selection</button>';
   buttons.innerHTML += '<br>';
