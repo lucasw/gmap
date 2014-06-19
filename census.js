@@ -1,21 +1,25 @@
 var map;
 var info;
-var selected_tractce = -1;
+var selected_tractce = [];
 var zoom_level = 14;
 
 var multiple_selection = false;
 
 function addToSelection() {
   multiple_selection = true; 
-  
+  makeButtons();
+}
+
+function switchToSingleSelection() {
+  multiple_selection = false; 
   makeButtons();
 }
 
 function startNewSelection() {
-  multiple_selection = false; 
-  
-  makeButtons();
+  selected_tractce = []; 
 }
+
+// TBD box selection
 
 function makeButtons() {
   buttons = document.getElementById("buttons");
@@ -25,8 +29,9 @@ function makeButtons() {
     buttons.innerHTML += '<button onclick="addToSelection()">Add to selection</button>';
   } else {
     //console.log("starting new selection");
-    buttons.innerHTML += '<button onclick="startNewSelection()">Start New Selection</button>';
+    buttons.innerHTML += '<button onclick="switchToSinglSelection()">Switch To Single Selection</button>';
   }
+  buttons.innerHTML += '<button onclick="clearSelection()">Clear Selection</button>';
   buttons.innerHTML += '<br>';
 }
 
@@ -69,7 +74,6 @@ function initialize() {
       var stroke_opacity = 0.4;
 
       //console.log(tractce + " " + selected_tractce);
-      
 
       //console.log(density + " " + color);
       // this is probably the wrong time to do this?
@@ -114,7 +118,15 @@ function initialize() {
           return;
         }
         if (property == 'TRACTCE10') {
-          selected_tractce = value;
+          if (multiple_selection) {
+            // only add if not
+            if (selected_tractce.indexOf(value) < 0) {
+              selected_tractce[selected_tractce.length] = value;
+            }
+          } else {
+            selected_tractce = [value];
+
+          }
           //console.log(selected_tractce);
         }
         if (property == 'density') value = value.toFixed(2) + ' persons/acre';
@@ -124,22 +136,35 @@ function initialize() {
 
     console.log("cur tract " + selected_tractce);
 
-
+    
+    total_population = 0;
+    total_area = 0;
     map.data.forEach(function(feature) {
       var tractce = feature.getProperty('TRACTCE10');
-      if (tractce == selected_tractce) {
-        var blockce = feature.getProperty('BLOCKCE');
-        //console.log("cur block " + blockce + "," + feature);
-        map.data.overrideStyle(feature, 
-        {
-          zIndex: 6,
-          strokeOpacity: 0.7, 
-          strokeWeight: zoom_level/7.0 + 1, 
-          strokeColor: 'red'
-          } );
-      }
+      for (var i = 0; i < selected_tractce.length; i++) {
+        if (tractce == selected_tractce[i]) {
+          
+          total_area += feature.getProperty('area');
+          total_population += feature.getProperty('POP10');
+          
+          //var blockce = feature.getProperty('BLOCKCE');
+          //console.log("cur block " + blockce + "," + feature);
+          map.data.overrideStyle(feature, 
+          {
+            zIndex: 6,
+            strokeOpacity: 0.7, 
+            strokeWeight: zoom_level/7.0 + 1, 
+            strokeColor: 'red'
+            } );
+        }
+      } // for each selected
     });
-    
+   
+    content += '<br><br>';
+    content += 'total population :' + total_population.toFixed(2) + '<br>';
+    content += 'total area :' + total_area.toFixed(2) + '<br>';
+    content += 'total density :' + (total_population/total_area).toFixed(2) + '<br>';
+
     content += '<br><br><br>'; 
     //console.log(content);
     info.innerHTML = content; 
