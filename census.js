@@ -186,7 +186,9 @@ function initialize() {
           map.data.overrideStyle(feature, 
             {
               zIndex: 7,
-              strokeOpacity: 0.7, 
+              fillColor: 'black',
+              fillOpacity: 0.3,
+              strokeOpacity: 0.54, 
               strokeWeight: 3, 
               strokeColor: 'black'
             } );
@@ -206,6 +208,8 @@ function initialize() {
     map.data.overrideStyle(event.feature, 
       {
         zIndex: 7,
+        fillColor: 'black',
+        fillOpacity: 0.5,
         strokeOpacity: 0.9, 
         strokeWeight: 4, 
         strokeColor: 'black'
