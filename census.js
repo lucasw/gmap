@@ -170,6 +170,9 @@ function initialize() {
    
     var content = "";
 
+    geom = event.feature.getGeometry()
+    content += event.feature.getGeometry().getBounds().lat() + '<br>';
+
     var tractce = event.feature.getProperty('TRACTCE10');
     selected_tractce = [tractce];
     var block = event.feature.getProperty('BLOCKCE');
@@ -268,6 +271,10 @@ function initialize() {
     square_select_two = false;
     // TBD keep selecting?
     // square_select_one = true;
+
+    // TBD add all blocks that intersect the bounds to be added to the 
+    // selected_blocks
+    // use LatLngBounds.intersects( )
   }
   
   if ((sq_latlng1 != null) && (sq_latlng2 != null)) {
