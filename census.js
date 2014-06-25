@@ -149,10 +149,20 @@ function initialize() {
     zIndex: 4,
     map: map,
     bounds: new google.maps.LatLngBounds(
-      new google.maps.LatLng(47.6043, -122.342),
-      new google.maps.LatLng(47.6243, -122.322)
+      new google.maps.LatLng(0,0),
+      new google.maps.LatLng(0,0)
     )
   });
+
+  /* // Try to respond to click anywhere, but not working
+  google.maps.event.addListener('click', function(event) {
+    
+    console.log("click " +  event.latLng);
+    var content = "";
+ 
+
+  });
+  */
 
   // click to update info
   map.data.addListener('click', function(event) {
@@ -259,15 +269,7 @@ function initialize() {
     // TBD keep selecting?
     // square_select_one = true;
   }
-  if (sq_latlng1 != null) {
-    content += 'first corner ' + sq_latlng1.lat().toFixed(4) + ', ' + 
-        sq_latlng1.lng().toFixed(4) + '<br>';
-  }
-  if (sq_latlng2 != null) {
-    content += 'second corner ' + sq_latlng2.lat().toFixed(4) + ', ' + 
-        sq_latlng2.lng().toFixed(4) + '<br>';
-  }
-
+  
   if ((sq_latlng1 != null) && (sq_latlng2 != null)) {
     content += "draw square";
 
@@ -287,16 +289,15 @@ function initialize() {
       )
     };
     selected_rect.setOptions(rect_options);
-
-/*
-    selected_rect.bounds = new google.maps.LatLngBounds(
-      sq_latlng1,
-      sq_latlng2
-    );
-    selected_rect.zIndex = 7;
-    */
   }
-
+  if (sq_latlng1 != null) {
+    content += 'first corner ' + sq_latlng1.lat().toFixed(4) + ', ' + 
+        sq_latlng1.lng().toFixed(4) + '<br>';
+  }
+  if (sq_latlng2 != null) {
+    content += 'second corner ' + sq_latlng2.lat().toFixed(4) + ', ' + 
+        sq_latlng2.lng().toFixed(4) + '<br>';
+  }
     //console.log(content);
     info.innerHTML = content; 
 
