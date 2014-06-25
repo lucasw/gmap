@@ -4,6 +4,8 @@ var square_select_one = false;
 var square_select_two = false;
 var sq_latlng1 = null;
 var sq_latlng2 = null;
+var selected_rect = null;
+
 var selected_tractce = [];
 var selected_blocks = [];
 var zoom_level = 14;
@@ -124,6 +126,7 @@ function initialize() {
   // this marker will flash on screen at this location when a new
   // feature is clicked
   var homeLatLng = new google.maps.LatLng(47.0043, -122.342);
+  /*
   var marker_tract = new MarkerWithLabel({
     position: homeLatLng,
     draggable: false,
@@ -135,14 +138,27 @@ function initialize() {
     labelStyle: {opacity: 0.75},
     icon: {}
   });
+  */
+
+  selected_rect = new google.maps.Rectangle({
+    strokeColor: "hsl(50%, 80%, 30%)",
+    srokeOpacity: 0.9,
+    strokeWeight: 2,
+    fillColor: "hsl(55%, 80%, 30%)",
+    fillOpacity: 0.5,
+    zIndex: 8,
+    map: map,
+    bounds: new google.maps.LatLngBounds(
+      new google.maps.LatLng(47.6043, -122.342),
+      new google.maps.LatLng(47.6243, -122.322)
+    )
+  });
 
   // click to update info
   map.data.addListener('click', function(event) {
-  map.data.revertStyle();
+    map.data.revertStyle();
    
-   var content = "";
-  
-
+    var content = "";
 
     var tractce = event.feature.getProperty('TRACTCE10');
     selected_tractce = [tractce];
@@ -251,6 +267,16 @@ function initialize() {
     content += 'second corner ' + sq_latlng2.lat().toFixed(4) + ', ' + 
         sq_latlng2.lng().toFixed(4) + '<br>';
   }
+
+  if ((sq_latlng1 != null) && (sq_latlng2 != null)) {
+    content += "draw square";
+    selected_rect.bounds = new google.maps.LatLngBounds(
+      sq_latlng1,
+      sq_latlng2
+    );
+    selected_rect.zIndex = 7;
+  }
+
     //console.log(content);
     info.innerHTML = content; 
 
