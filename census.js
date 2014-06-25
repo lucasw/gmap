@@ -1,5 +1,9 @@
 var map;
 var info;
+var square_select_one = false;
+var square_select_two = false;
+var sq_latlng1 = null;
+var sq_latlng2 = null;
 var selected_tractce = [];
 var selected_blocks = [];
 var zoom_level = 14;
@@ -17,7 +21,24 @@ function switchToSingleSelection() {
 }
 
 function clearSelection() {
-  selected_blocks = []; 
+  selected_blocks = [];
+  square_select_one = false;
+  square_select_two = false;
+  sq_latlng1 = null;
+  sq_latlng2 = null;
+}
+
+function selectSquareCorner() {
+  if (!square_select_one || (sq_latlng1 == null)) {
+    console.log("select first corner");
+    square_select_one = true;
+    sq_latlng1 = null;
+    sq_latlng2 = null;
+  } /*else {
+    console.log("select second corner");
+    square_select_two = true;
+    sq_latlng2 = null;
+  }*/
 }
 
 // TBD box selection
@@ -32,6 +53,13 @@ function makeButtons() {
     //console.log("starting new selection");
     buttons.innerHTML += '<button onclick="switchToSingleSelection()">Switch To Single Selection</button>';
   }
+  buttons.innerHTML += '<br>';
+  if (square_select_one || square_select_two) {
+    buttons.innerHTML += '<button onclick="selectSquareCorner()">Reset square select corner</button>';
+  } else {
+    buttons.innerHTML += '<button onclick="selectSquareCorner()">Square select corner</button>';
+  }
+  buttons.innerHTML += '<br>';
   buttons.innerHTML += '<button onclick="clearSelection()">Clear Selection</button>';
   buttons.innerHTML += '<br>';
 }
@@ -110,9 +138,11 @@ function initialize() {
 
   // click to update info
   map.data.addListener('click', function(event) {
-    map.data.revertStyle();
-    
-    var content = "";
+  map.data.revertStyle();
+   
+   var content = "";
+  
+
 
     var tractce = event.feature.getProperty('TRACTCE10');
     selected_tractce = [tractce];
@@ -202,6 +232,25 @@ function initialize() {
     content += 'total density :' + (total_population/total_area).toFixed(2) + '<br>';
 
     content += '<br><br><br>'; 
+
+  if (square_select_one) {
+    sq_latlng1 = event.latLng;
+    square_select_one = false;
+    square_select_two = true;
+  } else if (square_select_two) {
+    sq_latlng2 = event.latLng;
+    square_select_two = false;
+    // TBD keep selecting?
+    // square_select_one = true;
+  }
+  if (sq_latlng1 != null) {
+    content += 'first corner ' + sq_latlng1.lat().toFixed(4) + ', ' + 
+        sq_latlng1.lng().toFixed(4) + '<br>';
+  }
+  if (sq_latlng2 != null) {
+    content += 'second corner ' + sq_latlng2.lat().toFixed(4) + ', ' + 
+        sq_latlng2.lng().toFixed(4) + '<br>';
+  }
     //console.log(content);
     info.innerHTML = content; 
 
