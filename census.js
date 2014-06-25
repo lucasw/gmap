@@ -146,7 +146,7 @@ function initialize() {
     strokeWeight: 2,
     fillColor: "hsl(55%, 80%, 30%)",
     fillOpacity: 0.5,
-    zIndex: 8,
+    zIndex: 4,
     map: map,
     bounds: new google.maps.LatLngBounds(
       new google.maps.LatLng(47.6043, -122.342),
@@ -271,21 +271,23 @@ function initialize() {
   if ((sq_latlng1 != null) && (sq_latlng2 != null)) {
     content += "draw square";
 
-  selected_rect = new google.maps.Rectangle({
-    strokeColor: "hsl(50%, 80%, 30%)",
-    srokeOpacity: 0.9,
-    strokeWeight: 2,
-    fillColor: "hsl(55%, 80%, 30%)",
-    fillOpacity: 0.5,
-    zIndex: 8,
-    map: map,
-    bounds: new google.maps.LatLngBounds(
-      sq_latlng1,
-      sq_latlng2
-     // new google.maps.LatLng(47.6043, -122.342),
-     // new google.maps.LatLng(47.6243, -122.322)
-    )
-  });
+    rect_options = {
+      strokeColor: "hsl(50%, 80%, 10%)",
+      srokeOpacity: 0.9,
+      strokeWeight: 2,
+      fillColor: "hsl(55%, 80%, 30%)",
+      fillOpacity: 0.2,
+      zIndex: 4,
+      map: map,
+      bounds: new google.maps.LatLngBounds(
+        sq_latlng1,
+        sq_latlng2
+      // new google.maps.LatLng(47.6043, -122.342),
+      // new google.maps.LatLng(47.6243, -122.322)
+      )
+    };
+    selected_rect.setOptions(rect_options);
+
 /*
     selected_rect.bounds = new google.maps.LatLngBounds(
       sq_latlng1,
