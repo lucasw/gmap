@@ -12,10 +12,16 @@ var selected_blocks = [];
 var zoom_level = 14;
 
 var multiple_selection = false;
+var subtract_from_selection = false;
 
-function addToSelection() {
-  multiple_selection = true; 
+function enableAddToSelection() {
+  multiple_selection = true;
+  subtract_from_selection = false;
   makeButtons();
+}
+
+function enableSubtractFromSelection() {
+  subtract_from_selection = true;
 }
 
 function switchToSingleSelection() {
@@ -99,12 +105,12 @@ function makeButtons() {
   buttons.innerHTML = '<br>';
   if (!multiple_selection) { 
     //console.log("multiple selection");
-    buttons.innerHTML += '<button onclick="addToSelection()">Add to selection</button>';
+    buttons.innerHTML += '<button onclick="enableAddToSelection()">Add to selection</button>';
   } else {
     //console.log("starting new selection");
     buttons.innerHTML += '<button onclick="switchToSingleSelection()">Switch To Single Selection</button>';
   }
-  buttons.innerHTML += '<button onclick="subtractFromSelection()">Subtract from selection</button>';
+  buttons.innerHTML += '<button onclick="enableSubtractFromSelection()">Subtract from selection</button>';
   buttons.innerHTML += '<br>';
   if (square_select_one || square_select_two) {
     buttons.innerHTML += '<button onclick="selectSquareCorner()">Reset square select corner</button>';
@@ -134,6 +140,24 @@ function addSelectedBlock(new_block) {
 
   if (not_a_dupe) {
     selected_blocks[selected_blocks.length] = new_block;
+  }
+}
+
+function subtractSelectedBlock(new_block) {
+  
+  var index = -1;
+  for (var i = 0; i < selected_blocks.length; i++) {
+    // the block numbers aren't unique
+    if ((new_block.block == selected_blocks[i].block) && 
+        (new_block.tract == selected_blocks[i].tract)) {
+            
+       index = i;
+       break;
+    }
+  }
+
+  if (index >= 0) {
+     // remove index at  
   }
 }
 
@@ -302,7 +326,11 @@ function initialize() {
     };
                                     
     if (multiple_selection) {
-      addSelectedBlock(new_block);
+      if (!subtract_from_selection) {
+        addSelectedBlock(new_block);
+      } else {
+        subtractSelectedBlock(new_block);
+      }
     } else {
       selected_blocks = [new_block];
     }
