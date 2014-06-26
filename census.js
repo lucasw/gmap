@@ -75,8 +75,9 @@ function addSelectedBlock(new_block) {
     // the block numbers aren't unique
     // TBD click to unselect?
     if ((new_block.block == selected_blocks[i].block) && 
-        (new_block.tractce == selected_blocks[i].tract)) {
+        (new_block.tract == selected_blocks[i].tract)) {
       not_a_dupe = false;
+      //console.log("is a dupe", new_block.block, new_block.tractce);
       break;
     }
   }
@@ -269,6 +270,7 @@ function initialize() {
       // see if current block is in the selected square, then add it to 
       // selected blocks
       if ((sq_latlng1 != null) && (sq_latlng2 != null)) {
+        addSelectedBlock(new_block);
       
       }
 
