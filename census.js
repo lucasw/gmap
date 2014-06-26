@@ -24,6 +24,7 @@ function switchToSingleSelection() {
 }
 
 function highlightSelectedFeatures() {
+    map.data.revertStyle();
     map.data.forEach(function(feature) {
       var cur_tract = feature.getProperty('TRACTCE10');
       var cur_block = feature.getProperty('BLOCKCE');
@@ -69,6 +70,12 @@ function clearSelection() {
   square_select_two = false;
   sq_latlng1 = null;
   sq_latlng2 = null;
+
+  // TBD put in selected square
+  selected_square_bounds = new google.maps.LatLngBounds()
+  selected_square_bounds.extend( new google.maps.LatLng(0,0) );
+  selected_square_bounds.extend( new google.maps.LatLng(0,0) );
+
   highlightSelectedFeatures();
 }
 
@@ -97,6 +104,7 @@ function makeButtons() {
     //console.log("starting new selection");
     buttons.innerHTML += '<button onclick="switchToSingleSelection()">Switch To Single Selection</button>';
   }
+  buttons.innerHTML += '<button onclick="subtractFromSelection()">Subtract from selection</button>';
   buttons.innerHTML += '<br>';
   if (square_select_one || square_select_two) {
     buttons.innerHTML += '<button onclick="selectSquareCorner()">Reset square select corner</button>';
