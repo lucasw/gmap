@@ -23,12 +23,53 @@ function switchToSingleSelection() {
   makeButtons();
 }
 
+function highlightSelectedFeatures() {
+    map.data.forEach(function(feature) {
+      var cur_tract = feature.getProperty('TRACTCE10');
+      var cur_block = feature.getProperty('BLOCKCE');
+      // for each selected block highlight if in same tract as selected
+      for (var i = 0; i < selected_tractce.length; i++) {
+        if (cur_tract == selected_tractce[i]) {
+          map.data.overrideStyle(feature, 
+          {
+            zIndex: 6,
+            strokeOpacity: 0.4, 
+            strokeWeight: zoom_level/10.0 + 1, 
+            strokeColor: 'red'
+            } );
+        }
+      }  
+      
+      // aggregate stats over whole selection of blocks
+      for (var i = 0; i < selected_blocks.length; i++) {
+        // the block numbers aren't unique
+        if ((cur_block == selected_blocks[i].block) && 
+            (cur_tract == selected_blocks[i].tract)) {
+          //console.log(selected_blocks[i]);
+          total_area += feature.getProperty('area');
+          total_population += feature.getProperty('POP10');
+          map.data.overrideStyle(feature, 
+            {
+              zIndex: 7,
+              fillColor: 'black',
+              fillOpacity: 0.3,
+              strokeOpacity: 0.54, 
+              strokeWeight: 3, 
+              strokeColor: 'black'
+            } );
+        }
+      } // for each selected block highlight 
+    
+    });  // for each feature
+}
+
 function clearSelection() {
   selected_blocks = [];
   square_select_one = false;
   square_select_two = false;
   sq_latlng1 = null;
   sq_latlng2 = null;
+  highlightSelectedFeatures();
 }
 
 function selectSquareCorner() {
@@ -303,44 +344,9 @@ function initialize() {
       });
     } // add square selection
 
-    map.data.forEach(function(feature) {
-      var cur_tract = feature.getProperty('TRACTCE10');
-      var cur_block = feature.getProperty('BLOCKCE');
-      // for each selected block highlight if in same tract as selected
-      for (var i = 0; i < selected_tractce.length; i++) {
-        if (cur_tract == selected_tractce[i]) {
-          map.data.overrideStyle(feature, 
-          {
-            zIndex: 6,
-            strokeOpacity: 0.4, 
-            strokeWeight: zoom_level/10.0 + 1, 
-            strokeColor: 'red'
-            } );
-        }
-      }  
-      
-      // aggregate stats over whole selection of blocks
-      for (var i = 0; i < selected_blocks.length; i++) {
-        // the block numbers aren't unique
-        if ((cur_block == selected_blocks[i].block) && 
-            (cur_tract == selected_blocks[i].tract)) {
-          //console.log(selected_blocks[i]);
-          total_area += feature.getProperty('area');
-          total_population += feature.getProperty('POP10');
-          map.data.overrideStyle(feature, 
-            {
-              zIndex: 7,
-              fillColor: 'black',
-              fillOpacity: 0.3,
-              strokeOpacity: 0.54, 
-              strokeWeight: 3, 
-              strokeColor: 'black'
-            } );
-        }
-      } // for each selected block highlight 
-    
-    });  // for each feature
-   
+    highlightSelectedFeatures();
+
+
     content += '<br><br>';
     content += 'total population :' + total_population.toFixed(2) + '<br>';
     content += 'total area :' + total_area.toFixed(2) + '<br>';
