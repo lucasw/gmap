@@ -66,6 +66,27 @@ function makeButtons() {
   buttons.innerHTML += '<br>';
 }
 
+function addSelectedBlock(new_block) {
+
+  // only add if not in list already TBD indexOf like this doesn't work
+  var not_a_dupe = true;
+
+  for (var i = 0; i < selected_blocks.length; i++) {
+    // the block numbers aren't unique
+    // TBD click to unselect?
+    if ((new_block.block == selected_blocks[i].block) && 
+        (new_block.tractce == selected_blocks[i].tract)) {
+      not_a_dupe = false;
+      break;
+    }
+  }
+
+  if (not_a_dupe) {
+    selected_blocks[selected_blocks.length] = new_block;
+  }
+}
+
+/////////////////////////
 function initialize() {
   var mapOptions = {
     center: new google.maps.LatLng(47.6043, -122.342),
@@ -82,12 +103,35 @@ function initialize() {
   //map.data.loadGeoJson("data/seattle_census_tracts.json");
   map.data.loadGeoJson("data/seattle_census_tracts_district_7.json"); 
 
+  // http://stackoverflow.com/questions/24401240/how-to-get-latlngbounds-of-feature-polygon-geometry-in-google-maps-v3
+  // loadGeoJson runs asnchronously, listen to the addfeature-event
+  google.maps.event.addListener(map.data, 'addfeature', function(e) {
+
+    // check for a polygon
+    if (e.feature.getGeometry().getType() === 'Polygon') {
+
+      // initialize the bounds
+      var bounds = new google.maps.LatLngBounds();
+
+      // iterate over the paths
+      e.feature.getGeometry().getArray().forEach(function(path) {
+        //iterate over the points in the path
+        path.getArray().forEach(function(latLng) {
+          // extend the bounds
+          bounds.extend(latLng);
+        });
+      });
+
+      // now use the bounds
+      e.feature.setProperty('bounds', bounds);
+    }
+  });
+
   google.maps.event.addListener(map, 'zoom_changed', function() {
       
       zoom_level = map.getZoom();
       console.log("zoom " + zoom_level);
-  });
-
+  });  
 
   map.data.setStyle(function(feature) {
       var density = feature.getProperty('density');
@@ -166,12 +210,28 @@ function initialize() {
 
   // click to update info
   map.data.addListener('click', function(event) {
+
     map.data.revertStyle();
    
     var content = "";
 
+    if (square_select_one) {
+      sq_latlng1 = event.latLng;
+      square_select_one = false;
+      square_select_two = true;
+    } else if (square_select_two) {
+      sq_latlng2 = event.latLng;
+      square_select_two = false;
+      // TBD keep selecting?
+      // square_select_one = true;
+
+      // TBD add all blocks that intersect the bounds to be added to the 
+      // selected_blocks
+      // use LatLngBounds.intersects( )
+    }
+
     geom = event.feature.getGeometry()
-    content += event.feature.getGeometry().getBounds().lat() + '<br>';
+    //content += event.feature.getGeometry().getBounds().lat() + '<br>';
 
     var tractce = event.feature.getProperty('TRACTCE10');
     selected_tractce = [tractce];
@@ -183,42 +243,35 @@ function initialize() {
     };
                                     
     if (multiple_selection) {
-      // only add if not in list already TBD indexOf like this doesn't work
-      var not_a_dupe = true;
-
-      for (var i = 0; i < selected_blocks.length; i++) {
-        // the block numbers aren't unique
-        // TBD click to unselect?
-        if ((block == selected_blocks[i].block) && 
-            (tractce == selected_blocks[i].tract)) {
-          not_a_dupe = false;
-          break;
-        }
-      }
-
-      if (not_a_dupe) {
-        selected_blocks[selected_blocks.length] = new_block;
-      }
+      addSelectedBlock(new_block);
     } else {
       selected_blocks = [new_block];
     }
 
     event.feature.forEachProperty(function(value, property) {
-        if (property == 'BLOCKID10') {
-          return;
-        }
+      if (property == 'BLOCKID10') {
+        return;
+      }
           
-        if (property == 'density') value = value.toFixed(2) + ' persons/acre';
-        if (property == 'area') value = value.toFixed(2) + ' acres';
-        content +=  property + ' : ' + value + '<br>';
+      if (property == 'density') value = value.toFixed(2) + ' persons/acre';
+      if (property == 'area') value = value.toFixed(2) + ' acres';
+      content +=  property + ' : ' + value + '<br>';
     });
 
     console.log("cur tract " + selected_tractce[0]);
 
     total_population = 0;
     total_area = 0;
+
+    ////////////////////////////////////////////////////////
     map.data.forEach(function(feature) {
-     
+    
+      // see if current block is in the selected square, then add it to 
+      // selected blocks
+      if ((sq_latlng1 != null) && (sq_latlng2 != null)) {
+      
+      }
+
       var cur_tract = feature.getProperty('TRACTCE10');
       // for each selected block highlight if in same tract as selected
       for (var i = 0; i < selected_tractce.length; i++) {
@@ -253,6 +306,7 @@ function initialize() {
             } );
         }
       } // for each selected block highlight 
+    
     });  // for each feature
    
     content += '<br><br>';
@@ -261,21 +315,6 @@ function initialize() {
     content += 'total density :' + (total_population/total_area).toFixed(2) + '<br>';
 
     content += '<br><br><br>'; 
-
-  if (square_select_one) {
-    sq_latlng1 = event.latLng;
-    square_select_one = false;
-    square_select_two = true;
-  } else if (square_select_two) {
-    sq_latlng2 = event.latLng;
-    square_select_two = false;
-    // TBD keep selecting?
-    // square_select_one = true;
-
-    // TBD add all blocks that intersect the bounds to be added to the 
-    // selected_blocks
-    // use LatLngBounds.intersects( )
-  }
   
   if ((sq_latlng1 != null) && (sq_latlng2 != null)) {
     content += "draw square";
