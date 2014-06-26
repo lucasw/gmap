@@ -5,6 +5,7 @@ var square_select_two = false;
 var sq_latlng1 = null;
 var sq_latlng2 = null;
 var selected_rect = null;
+var selected_square_bounds = null;
 
 var selected_tractce = [];
 var selected_blocks = [];
@@ -116,7 +117,7 @@ function initialize() {
 
       // iterate over the paths
       e.feature.getGeometry().getArray().forEach(function(path) {
-        //iterate over the points in the path
+        // iterate over the points in the path
         path.getArray().forEach(function(latLng) {
           // extend the bounds
           bounds.extend(latLng);
@@ -124,6 +125,7 @@ function initialize() {
       });
 
       // now use the bounds
+      //console.log(bounds.getNorthEast());
       e.feature.setProperty('bounds', bounds);
     }
   });
@@ -185,6 +187,10 @@ function initialize() {
   });
   */
 
+  selected_square_bounds = new google.maps.LatLngBounds()
+  selected_square_bounds.extend( new google.maps.LatLng(0,0) );
+  selected_square_bounds.extend( new google.maps.LatLng(0,0) );
+
   selected_rect = new google.maps.Rectangle({
     strokeColor: "hsl(50%, 80%, 30%)",
     srokeOpacity: 0.9,
@@ -193,10 +199,7 @@ function initialize() {
     fillOpacity: 0.5,
     zIndex: 4,
     map: map,
-    bounds: new google.maps.LatLngBounds(
-      new google.maps.LatLng(0,0),
-      new google.maps.LatLng(0,0)
-    )
+    bounds: selected_square_bounds
   });
 
   /* // Try to respond to click anywhere, but not working
@@ -215,20 +218,26 @@ function initialize() {
     map.data.revertStyle();
    
     var content = "";
-
+    
+    var add_selected_square = false;
+    
     if (square_select_one) {
       sq_latlng1 = event.latLng;
       square_select_one = false;
       square_select_two = true;
     } else if (square_select_two) {
       sq_latlng2 = event.latLng;
+      selected_square_bounds = new google.maps.LatLngBounds();
+      selected_square_bounds.extend(sq_latlng1);
+      selected_square_bounds.extend(sq_latlng2);
+      
       square_select_two = false;
       // TBD keep selecting?
       // square_select_one = true;
 
       // TBD add all blocks that intersect the bounds to be added to the 
       // selected_blocks
-      // use LatLngBounds.intersects( )
+      add_selected_square = true;
     }
 
     geom = event.feature.getGeometry()
@@ -265,16 +274,38 @@ function initialize() {
     total_area = 0;
 
     ////////////////////////////////////////////////////////
-    map.data.forEach(function(feature) {
-    
-      // see if current block is in the selected square, then add it to 
-      // selected blocks
-      if ((sq_latlng1 != null) && (sq_latlng2 != null)) {
-        addSelectedBlock(new_block);
+    // loop through all features to determine if they are in new
+    // selections
+    if (add_selected_square) {  
+      map.data.forEach(function(feature) {
+        var cur_tract = feature.getProperty('TRACTCE10');
+        var cur_block = feature.getProperty('BLOCKCE');
       
-      }
+        // see if current block is in the selected square, then add it to 
+        // selected blocks
+        var cur_bounds = feature.getProperty('bounds');
+        if (cur_bounds !== null) {
+          var does_intersect = cur_bounds.intersects(selected_square_bounds);
+          //var does_intersect = selected_square_bounds.contains(cur_bounds.getNorthEast());
+          //console.log(does_intersect); // + " " + cur_bounds.getNorthEast());
+          //console.log(does_intersect + " " +
+          //    selected_square_bounds.getSouthWest() + " " +
+          //    selected_square_bounds.getNorthEast());
+          if (does_intersect) {
+            var cur_block = {
+                'tract':cur_tract,
+                'block':cur_block
+            };
 
+            addSelectedBlock(cur_block);
+          }
+        }
+      });
+    } // add square selection
+
+    map.data.forEach(function(feature) {
       var cur_tract = feature.getProperty('TRACTCE10');
+      var cur_block = feature.getProperty('BLOCKCE');
       // for each selected block highlight if in same tract as selected
       for (var i = 0; i < selected_tractce.length; i++) {
         if (cur_tract == selected_tractce[i]) {
@@ -288,7 +319,6 @@ function initialize() {
         }
       }  
       
-      var cur_block = feature.getProperty('BLOCKCE');
       // aggregate stats over whole selection of blocks
       for (var i = 0; i < selected_blocks.length; i++) {
         // the block numbers aren't unique
@@ -329,12 +359,7 @@ function initialize() {
       fillOpacity: 0.2,
       zIndex: 4,
       map: map,
-      bounds: new google.maps.LatLngBounds(
-        sq_latlng1,
-        sq_latlng2
-      // new google.maps.LatLng(47.6043, -122.342),
-      // new google.maps.LatLng(47.6243, -122.322)
-      )
+      bounds: selected_square_bounds
     };
     selected_rect.setOptions(rect_options);
   }
