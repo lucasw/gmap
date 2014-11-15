@@ -175,8 +175,8 @@ function initialize() {
 
   makeButtons();
 
-  //map.data.loadGeoJson("data/seattle_census_tracts.json");
-  map.data.loadGeoJson("data/seattle_census_tracts_district_7.json"); 
+  map.data.loadGeoJson("data/seattle_census_tracts.json");
+  //map.data.loadGeoJson("data/seattle_census_tracts_district_7.json"); 
 
   // http://stackoverflow.com/questions/24401240/how-to-get-latlngbounds-of-feature-polygon-geometry-in-google-maps-v3
   // loadGeoJson runs asnchronously, listen to the addfeature-event
