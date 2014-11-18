@@ -163,29 +163,35 @@ function subtractSelectedBlock(new_block) {
 /////////////////////////
 function initialize() {
   var mapOptions = {
-    center: new google.maps.LatLng(47.6043, -122.342),
-        zoom: zoom_level // 12 covers most of Seattle
+      center: new google.maps.LatLng(47.53557213, -122.283543),
+      zoom: zoom_level // 12 covers most of Seattle
   };
   map = new google.maps.Map(document.getElementById("map-canvas"),
       mapOptions);
   
   info = document.getElementById("info");
-  info.innerHTML = "Select a block to get information"; 
+  info.innerHTML = "Select a street to get information"; 
 
   makeButtons();
 
-  //map.data.loadGeoJson("data/streetnet_traffic_volumes_bounded.json");
-  map.data.loadGeoJson("data/seattle_city_council_districts.json");
+  // so these are loading as lines, and are clickable, but are very hard to click.
+  // they show up fine and large in qgis, what is wrong?
+  map.data.loadGeoJson("data/streetnet_traffic_volumes_bounded.json");
+  //map.data.loadGeoJson("data/seattle_city_council_districts.json");
 
   // http://stackoverflow.com/questions/24401240/how-to-get-latlngbounds-of-feature-polygon-geometry-in-google-maps-v3
   // loadGeoJson runs asnchronously, listen to the addfeature-event
   google.maps.event.addListener(map.data, 'addfeature', function(e) {
 
     // check for a line
-    if (e.feature.getGeometry().getType() === 'Polygon') {
+    feature_type = e.feature.getGeometry().getType();
+    console.log('feature_type ' + feature_type);
+    if (feature_type === 'Polygon') {
 
       // initialize the bounds
       var bounds = new google.maps.LatLngBounds();
+      
+      console.log(e.feature);
 
       // iterate over the paths
       e.feature.getGeometry().getArray().forEach(function(path) {
@@ -247,7 +253,7 @@ function initialize() {
 
   // this marker will flash on screen at this location when a new
   // feature is clicked
-  var homeLatLng = new google.maps.LatLng(47.0043, -122.342);
+  //var homeLatLng = new google.maps.LatLng(47.53557213, -122.283543);
   /*
   var marker_tract = new MarkerWithLabel({
     position: homeLatLng,
