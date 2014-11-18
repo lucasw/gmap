@@ -7,7 +7,6 @@ var sq_latlng2 = null;
 var selected_rect = null;
 var selected_square_bounds = null;
 
-var selected_tractce = [];
 var selected_blocks = [];
 var zoom_level = 14;
 
@@ -175,14 +174,15 @@ function initialize() {
 
   makeButtons();
 
-  map.data.loadGeoJson("data/streetnet_traffic_volumes_bounded.json");
+  //map.data.loadGeoJson("data/streetnet_traffic_volumes_bounded.json");
+  map.data.loadGeoJson("data/seattle_city_council_districts.json");
 
   // http://stackoverflow.com/questions/24401240/how-to-get-latlngbounds-of-feature-polygon-geometry-in-google-maps-v3
   // loadGeoJson runs asnchronously, listen to the addfeature-event
   google.maps.event.addListener(map.data, 'addfeature', function(e) {
 
     // check for a line
-    if (e.feature.getGeometry().getType() === 'LineString') {
+    if (e.feature.getGeometry().getType() === 'Polygon') {
 
       // initialize the bounds
       var bounds = new google.maps.LatLngBounds();
@@ -323,7 +323,6 @@ function initialize() {
       content +=  property + ' : ' + value + '<br>';
     });
 
-    console.log("cur tract " + selected_tractce[0]);
 
     total_population = 0;
     total_area = 0;
