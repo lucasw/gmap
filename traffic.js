@@ -185,13 +185,13 @@ function initialize() {
 
     // check for a line
     feature_type = e.feature.getGeometry().getType();
-    console.log('feature_type ' + feature_type);
+    //console.log('feature_type ' + feature_type);
     if (feature_type === 'Polygon') {
 
       // initialize the bounds
       var bounds = new google.maps.LatLngBounds();
       
-      console.log(e.feature);
+      //console.log(e.feature);
 
       // iterate over the paths
       e.feature.getGeometry().getArray().forEach(function(path) {
@@ -218,16 +218,16 @@ function initialize() {
 
   map.data.setStyle(function(feature) {
 
-      var density = 10; // feature.getProperty('density');
+      var density = feature.getProperty('ARTCLASS');
       
-      var h = Math.round( 360 * density/100.0);
+      var h = Math.round( 360 * density/6.0);
       var s = "90%";
       var l = "60%";
-      fill_opacity = 0.2;
-      if (density == 0) {
-        fill_opacity = 0.01;
+      fill_opacity = 0.4;
+      /*if (density == 0) {
+        fill_opacity = 0.4;
         l = "100%";
-      }
+      }*/
       var color = "hsl(" + h + "," + s + "," + l +")";
       var stroke_color = "hsl(" + h + ", 90%, 30%)";
       var stroke_opacity = 0.4;
@@ -324,9 +324,25 @@ function initialize() {
     geom = event.feature.getGeometry()
     //content += event.feature.getGeometry().getBounds().lat() + '<br>';
 
+    // display all the properties in the feature
     event.feature.forEachProperty(function(value, property) {
-          
-      content +=  property + ' : ' + value + '<br>';
+      /*if (property === 'volumes') {
+        //console.log('test');
+        //content += property + ' : ' + typeof(value) + '<br>';
+       } else if ((property === 'ARTCLASS') ||
+               (property === 'date') ||
+               (property === 'volume') ||
+               (property === 'volume_dir')) {
+        content += property + ' : ' + value + '<br>';
+      } else {
+        */
+      if (property[0] === 'v') {
+        content += value + '<br>';
+      }
+      // TODO need to do partial match to make this work
+      if (property === 'dirflow') {
+        content += '<br>';
+      }
     });
 
 
@@ -363,12 +379,13 @@ function initialize() {
     //console.log(content);
     info.innerHTML = content; 
 
+    // highlight the current selection
     map.data.overrideStyle(event.feature, 
       {
         zIndex: 7,
         fillColor: 'black',
-        fillOpacity: 0.5,
-        strokeOpacity: 0.9, 
+        fillOpacity: 0.2,
+        strokeOpacity: 0.5, 
         strokeWeight: 4, 
         strokeColor: 'black'
         } );
