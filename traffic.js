@@ -172,7 +172,7 @@ function initialize() {
   info = document.getElementById("info");
   info.innerHTML = "Select a street to get information"; 
 
-  makeButtons();
+  //makeButtons();
 
   // so these are loading as lines, and are clickable, but are very hard to click.
   // they show up fine and large in qgis, what is wrong?
@@ -229,8 +229,8 @@ function initialize() {
         l = "100%";
       }*/
       var color = "hsl(" + h + "," + s + "," + l +")";
-      var stroke_color = "hsl(" + h + ", 90%, 30%)";
-      var stroke_opacity = 0.4;
+      var stroke_color = 'black'; // "hsl(" + h + ", 90%, 30%)";
+      var stroke_opacity = 0.8;
 
       //console.log(tractce + " " + selected_tractce);
 
@@ -336,7 +336,9 @@ function initialize() {
         content += property + ' : ' + value + '<br>';
       } else {
         */
-      if (property[0] === 'v') {
+      if ((property === 'ARTCLASS')) {
+        content += 'Arterial Class : ' + value + '<br><br>';
+      } else if (property[0] === 'v') {
         content += value + '<br>';
       }
       // TODO need to do partial match to make this work
@@ -385,7 +387,7 @@ function initialize() {
         zIndex: 7,
         fillColor: 'black',
         fillOpacity: 0.2,
-        strokeOpacity: 0.5, 
+        strokeOpacity: 0.8, 
         strokeWeight: 4, 
         strokeColor: 'black'
         } );
