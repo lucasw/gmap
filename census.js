@@ -175,8 +175,8 @@ function initialize() {
 
   makeButtons();
 
-  map.data.loadGeoJson("data/seattle_census_tracts.json");
-  //map.data.loadGeoJson("data/seattle_census_tracts_district_7.json"); 
+  //map.data.loadGeoJson("data/seattle_census_tracts.json");
+  map.data.loadGeoJson("data/seattle_census_tracts_district_7.json"); 
 
   // http://stackoverflow.com/questions/24401240/how-to-get-latlngbounds-of-feature-polygon-geometry-in-google-maps-v3
   // loadGeoJson runs asnchronously, listen to the addfeature-event
@@ -291,7 +291,7 @@ function initialize() {
     map.data.revertStyle();
    
     var content = "";
-    
+  
     var add_selected_square = false;
     
     if (square_select_one) {
@@ -334,22 +334,7 @@ function initialize() {
     } else {
       selected_blocks = [new_block];
     }
-
-    event.feature.forEachProperty(function(value, property) {
-      if (property == 'BLOCKID10') {
-        return;
-      }
-          
-      if (property == 'density') value = value.toFixed(2) + ' persons/acre';
-      if (property == 'area') value = value.toFixed(2) + ' acres';
-      content +=  property + ' : ' + value + '<br>';
-    });
-
-    console.log("cur tract " + selected_tractce[0]);
-
-    total_population = 0;
-    total_area = 0;
-
+ 
     ////////////////////////////////////////////////////////
     // loop through all features to determine if they are in new
     // selections
@@ -379,6 +364,30 @@ function initialize() {
         }
       });
     } // add square selection
+
+    content += "Selected blocks<br>";
+    for (var i = 0; i < selected_blocks.length; i++) {
+      // the block numbers aren't unique
+      content += selected_blocks[i].tract + ", " + 
+          selected_blocks[i].block + '<br>';
+    }
+    content += "<br>";
+
+    event.feature.forEachProperty(function(value, property) {
+      if (property == 'BLOCKID10') {
+        return;
+      }
+          
+      if (property == 'density') value = value.toFixed(2) + ' persons/acre';
+      if (property == 'area') value = value.toFixed(2) + ' acres';
+      content +=  property + ' : ' + value + '<br>';
+    });
+
+    console.log("cur tract " + selected_tractce[0]);
+
+    total_population = 0;
+    total_area = 0;
+
 
     highlightSelectedFeatures();
 
