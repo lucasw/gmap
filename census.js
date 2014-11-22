@@ -332,9 +332,9 @@ function initialize() {
     if (multiple_selection) {
         content += "Multiple selection mode<br>";
       if (!subtract_from_selection) {
-        content += "Subtraction mode<br>";
         addSelectedBlock(new_block);
       } else {
+        content += "Subtraction mode<br>";
         subtractSelectedBlock(new_block);
       }
     } else {
