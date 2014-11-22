@@ -15,12 +15,14 @@ var multiple_selection = false;
 var subtract_from_selection = false;
 
 function enableAddToSelection() {
+  console.log("enabling adding to selection");
   multiple_selection = true;
   subtract_from_selection = false;
   makeButtons();
 }
 
 function enableSubtractFromSelection() {
+  console.log("now subtracting from selection");
   subtract_from_selection = true;
 }
 
@@ -55,10 +57,11 @@ function highlightSelectedFeatures() {
           //console.log(selected_blocks[i]);
           total_area += feature.getProperty('area');
           total_population += feature.getProperty('POP10');
+          color = 'black';
           map.data.overrideStyle(feature, 
             {
               zIndex: 7,
-              fillColor: 'black',
+              fillColor: color,
               fillOpacity: 0.3,
               strokeOpacity: 0.54, 
               strokeWeight: 3, 
@@ -157,7 +160,8 @@ function subtractSelectedBlock(new_block) {
   }
 
   if (index >= 0) {
-     // remove index at  
+     // remove index at 
+     selected_blocks.splice(index, 1);
   }
 }
 
@@ -327,7 +331,9 @@ function initialize() {
     };
                                     
     if (multiple_selection) {
+        content += "Multiple selection mode<br>";
       if (!subtract_from_selection) {
+        content += "Subtraction mode<br>";
         addSelectedBlock(new_block);
       } else {
         subtractSelectedBlock(new_block);
@@ -335,6 +341,7 @@ function initialize() {
     } else {
       selected_blocks = [new_block];
     }
+    content += "<br>";
  
     ////////////////////////////////////////////////////////
     // loop through all features to determine if they are in new
@@ -366,14 +373,30 @@ function initialize() {
       });
     } // add square selection
 
+    //console.log("cur tract " + selected_tractce[0]);
+
+    total_population = 0;
+    total_area = 0;
+
+    // this also updates the total population and area
+    highlightSelectedFeatures();
+
+    //content += '<br>';
+    content += 'total population :' + total_population.toFixed(2) + '<br>';
+    content += 'total area :' + total_area.toFixed(2) + '<br>';
+    content += 'total density :' + (total_population/total_area).toFixed(2) + '<br>';
+    content += '<br>'
+
+    // list selected blocks
     content += "Selected blocks<br>";
     for (var i = 0; i < selected_blocks.length; i++) {
       // the block numbers aren't unique
       content += selected_blocks[i].tract + ", " + 
           selected_blocks[i].block + '<br>';
     }
-    content += "<br>";
+    content += '<br>'
 
+    // show all properties of selected block
     event.feature.forEachProperty(function(value, property) {
       if (property == 'BLOCKID10') {
         return;
@@ -384,21 +407,7 @@ function initialize() {
       content +=  property + ' : ' + value + '<br>';
     });
 
-    console.log("cur tract " + selected_tractce[0]);
-
-    total_population = 0;
-    total_area = 0;
-
-
-    highlightSelectedFeatures();
-
-
-    content += '<br><br>';
-    content += 'total population :' + total_population.toFixed(2) + '<br>';
-    content += 'total area :' + total_area.toFixed(2) + '<br>';
-    content += 'total density :' + (total_population/total_area).toFixed(2) + '<br>';
-
-    content += '<br><br><br>'; 
+    content += '<br><br>'; 
   
   if ((sq_latlng1 != null) && (sq_latlng2 != null)) {
     content += "draw square";
@@ -426,15 +435,21 @@ function initialize() {
     //console.log(content);
     info.innerHTML = content; 
 
+    // highlight the current selection
+    color = 'black';
+    if (subtract_from_selection) {
+      color = 'blue';
+    }
     map.data.overrideStyle(event.feature, 
       {
         zIndex: 7,
-        fillColor: 'black',
+        fillColor: color,
         fillOpacity: 0.5,
         strokeOpacity: 0.9, 
         strokeWeight: 4, 
-        strokeColor: 'black'
+        strokeColor: color
         } );
+
   }); // click for info window
  
 }
