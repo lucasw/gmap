@@ -323,10 +323,12 @@ function initialize() {
     var tractce = event.feature.getProperty('TRACTCE10');
     selected_tractce = [tractce];
     var block = event.feature.getProperty('BLOCKCE');
+    var pop10 = event.feature.getProperty('POP10');
    
     var new_block = {
         'tract':tractce,
-        'block':block
+        'block':block,
+        'pop10':pop10
     };
                                     
     if (multiple_selection) {
@@ -349,6 +351,7 @@ function initialize() {
       map.data.forEach(function(feature) {
         var cur_tract = feature.getProperty('TRACTCE10');
         var cur_block = feature.getProperty('BLOCKCE');
+        var cur_pop = feature.getProperty('POP10');
       
         // see if current block is in the selected square, then add it to 
         // selected blocks
@@ -363,7 +366,8 @@ function initialize() {
           if (does_intersect) {
             var cur_block = {
                 'tract':cur_tract,
-                'block':cur_block
+                'block':cur_block,
+                'pop10':cur_pop
             };
 
             addSelectedBlock(cur_block);
@@ -387,13 +391,20 @@ function initialize() {
     content += '<br>'
 
     // list selected blocks
+    // TODO put in table
     content += "Selected blocks<br>";
+    content += "<table>";
     for (var i = 0; i < selected_blocks.length; i++) {
       // the block numbers aren't unique
-      content += selected_blocks[i].tract + ", " + 
-          selected_blocks[i].block + '<br>';
+      content += '<tr><td>' + 
+          selected_blocks[i].tract + 
+          '</td><td>' + 
+          selected_blocks[i].block + 
+          '</td><td>' + 
+          selected_blocks[i].pop10 + 
+          '</td></tr>';
     }
-    content += '<br>'
+    content += '</table><br>'
 
     // show all properties of selected block
     event.feature.forEachProperty(function(value, property) {
