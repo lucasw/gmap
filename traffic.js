@@ -176,7 +176,8 @@ function initialize() {
 
   // so these are loading as lines, and are clickable, but are very hard to click.
   // they show up fine and large in qgis, what is wrong?
-  map.data.loadGeoJson("data/streetnet_traffic_volumes_bounded.json");
+  json_file = document.getElementById("json").innerHTML;
+  map.data.loadGeoJson(json_file) //"data/streetnet_traffic_volumes_bounded.json");
   //map.data.loadGeoJson("data/seattle_city_council_districts.json");
 
   // http://stackoverflow.com/questions/24401240/how-to-get-latlngbounds-of-feature-polygon-geometry-in-google-maps-v3
@@ -220,7 +221,7 @@ function initialize() {
 
       var density = feature.getProperty('ARTCLASS');
       
-      var h = Math.round( 360 * density/6.0);
+      var h = Math.round( 30.0 + 360.0 * density/6.0 );
       var s = "90%";
       var l = "60%";
       fill_opacity = 0.4;
@@ -336,15 +337,18 @@ function initialize() {
         content += property + ' : ' + value + '<br>';
       } else {
         */
+        /*
       if ((property === 'ARTCLASS')) {
         content += 'Arterial Class : ' + value + '<br><br>';
-      } else if (property[0] === 'v') {
-        content += value + '<br>';
+      //} else if (property[0] === 'v') {
+      } else {
       }
       // TODO need to do partial match to make this work
-      if (property === 'dirflow') {
-        content += '<br>';
-      }
+      //if (property === 'dirflow') {
+      //  content += '<br>';
+      //}
+      */
+      content += property + ': ' + value + '<br>';
     });
 
 
@@ -395,5 +399,5 @@ function initialize() {
  
 }
 
-google.maps.event.addDomListener(window, 'load', initialize);
+google.maps.event.addDomListener(window, 'load', initialize );
 
